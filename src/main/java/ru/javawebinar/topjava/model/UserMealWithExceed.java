@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.model;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class UserMealWithExceed {
     private final LocalDateTime dateTime;
@@ -20,6 +21,10 @@ public class UserMealWithExceed {
 
     public LocalDateTime getDateTime() {
         return dateTime;
+    }
+
+    public LocalTime getTime() {
+        return dateTime.toLocalTime();
     }
 
     public boolean isExceed() {
