@@ -23,19 +23,18 @@ public class UserMealsUtil {
     }
 
 
-    public static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+    private static List<UserMealWithExceed> getFilteredWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
 
         Map<LocalDate, Integer> caloriesDay = mealList.stream()
                 .collect(Collectors.toMap(UserMeal::getLocalDate, UserMeal::getCalories,
                         Integer::sum,
                         HashMap::new));
 
-        List<UserMealWithExceed> list = mealList.stream()
+        final List<UserMealWithExceed> collect = mealList.stream()
                 .map(p -> new UserMealWithExceed(p.getDateTime(), p.getDescription(), p.getCalories(),
                         caloriesDay.get(p.getLocalDate()) > caloriesPerDay))
                 .filter(p -> TimeUtil.isBetween(p.getTime(), startTime, endTime))
                 .collect(Collectors.toList());
-
-        return list;
+        return collect;
     }
 }
