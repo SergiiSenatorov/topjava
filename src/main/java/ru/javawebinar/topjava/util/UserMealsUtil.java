@@ -35,6 +35,7 @@ public class UserMealsUtil {
                         caloriesDay.get(p.getLocalDate()) > caloriesPerDay))
                 .filter(p -> TimeUtil.isBetween(p.getTime(), startTime, endTime))
                 .collect(Collectors.toList());
+        
         return collect;
     }
 }
