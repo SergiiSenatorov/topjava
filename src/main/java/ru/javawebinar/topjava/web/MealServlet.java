@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,12 +42,45 @@ public class MealServlet extends HttpServlet {
             return;
         }
 
-        switch (req.getParameter(action)) {
+        Long id = getId(req);
+
+        switch (action) {
+            case "delete" :
+                delete(resp,id);
+                break;
+            case "create" :
+                create(req,resp);
+                break;
+            case "edit" :
+                edit(req,resp,id);
+                break;
             default:
-                List<MealWithExceed> list = MealsUtil.getFilteredWithExceeded(repository.getAll(),LocalTime.MIN,LocalTime.MAX,2000);
-                req.setAttribute("mealList",list);
-                req.getRequestDispatcher("/meals.jsp").forward(req,resp);
+                getMeals(req,resp);
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+
+        try {
+            Long id = req.getParameter("id").isEmpty() ? null : Long.valueOf(req.getParameter("id"));
+            LocalDateTime dateTime = LocalDateTime.parse(req.getParameter("dateTime"));
+            String description = req.getParameter("description");
+            Integer calories = Integer.valueOf(req.getParameter("calories"));
+
+            if (!description.isEmpty() && calories != 0) {
+                Meal meal = new Meal(dateTime, description, calories);
+                meal.setId(id);
+                repository.save(meal);
+                log.info(meal.getId() == null ? "Create new Meal {}" : "Update current meal {}", meal.toString());
+            } else {
+                log.warn("Couldn't save a meal with empty data!");
+            }
+        } catch (NumberFormatException | DateTimeParseException e) {
+            log.warn("Couldn't parse meal data: {}", e.getMessage());
+        }
+        resp.sendRedirect("meals");
     }
 
     @Override
@@ -67,5 +101,42 @@ public class MealServlet extends HttpServlet {
         List<MealWithExceed> mealList = MealsUtil.getFilteredWithExceeded(repository.getAll(), LocalTime.MIN, LocalTime.MAX, 2000);
         req.setAttribute("mealList", mealList);
         req.getRequestDispatcher("meals.jsp").forward(req, resp);
+    }
+
+    private void delete(HttpServletResponse resp, Long id) throws IOException {
+        if (id != null) {
+            repository.delete(id);
+        } else {
+            log.warn("Couldn't delete meal with null or incorrect ID");
+        }
+        resp.sendRedirect("meals");
+    }
+
+    private void create(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        log.info("Create new meal...");
+        req.setAttribute("isEditFormVisible", "block");
+        Meal curMeal = new Meal(LocalDateTime.of(LocalDate.now(), LocalTime.of(LocalTime.now().getHour(), LocalTime.now().getMinute())), "", 0);
+        req.setAttribute("curMeal", curMeal);
+        getMeals(req, resp);
+    }
+
+    private void edit(HttpServletRequest req, HttpServletResponse resp, Long id) throws ServletException, IOException {
+        if (id != null) {
+            log.info("Edit meal with ID = {} ...", id);
+            req.setAttribute("isEditFormVisible", "block");
+            Meal curMeal = repository.getById(id);
+            req.setAttribute("curMeal", curMeal);
+        } else {
+            log.warn("Couldn't edit meal with null or incorrect ID");
+        }
+        getMeals(req, resp);
+    }
+
+    private Long getId(HttpServletRequest req) {
+        try {
+            return Long.valueOf(req.getParameter("id"));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

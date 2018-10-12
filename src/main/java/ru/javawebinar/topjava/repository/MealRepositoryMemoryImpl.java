@@ -3,10 +3,12 @@ package ru.javawebinar.topjava.repository;
 import ru.javawebinar.topjava.model.Meal;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 public class MealRepositoryMemoryImpl implements MealRepository {
 
@@ -32,6 +34,9 @@ public class MealRepositoryMemoryImpl implements MealRepository {
 
     @Override
     public List<Meal> getAll() {
-        return new ArrayList<>(meals.values());
+        return new ArrayList<>(meals.values())
+                .stream()
+                .sorted(Comparator.comparing(Meal::getDate))
+                .collect(Collectors.toList());
     }
 }
