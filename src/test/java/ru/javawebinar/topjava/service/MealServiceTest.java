@@ -16,17 +16,14 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
-import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 @ContextConfiguration({
-        "classpath:spring/spring-app.xml",
+        "classpath:spring/spring-app-db.xml",
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
