@@ -1,7 +1,12 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.Stopwatch;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -14,6 +19,10 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import javax.persistence.NoResultException;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.ADMIN_ID;
@@ -31,8 +40,37 @@ public class MealServiceTest {
         SLF4JBridgeHandler.install();
     }
 
+    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private static final Map<String, Long> testDurations = new HashMap<>();
+
     @Autowired
     private MealService service;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Rule
+    public Stopwatch stopwatch = new Stopwatch() {
+        @Override
+        protected void finished(long nanos, Description description) {
+            String testName = description.getMethodName();
+            Long duration = TimeUnit.NANOSECONDS.toMillis(nanos);
+            testDurations.put(testName, duration);
+            LOG.info(String.format("*** %s duration is %d ms", testName, duration));
+        }
+    };
+
+    @AfterClass
+    public static void after() {
+        if (!testDurations.isEmpty()) {
+            Stream<String> stream = testDurations.entrySet().stream()
+                    .sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
+                    .map(e -> String.format("%-20s %8d", e.getKey(), e.getValue()));
+            System.out.println("===== Длительность тестов =====");
+            stream.forEach(System.out::println);
+            System.out.println("===============================");
+        }
+    }
 
     @Test
     public void delete() throws Exception {
@@ -40,8 +78,9 @@ public class MealServiceTest {
         assertMatch(service.getAll(USER_ID), MEAL6, MEAL5, MEAL4, MEAL3, MEAL2);
     }
 
-    @Test(expected = NoResultException.class)
+    @Test
     public void deleteNotFound() throws Exception {
+        thrown.expect(NoResultException.class);
         service.delete(MEAL1_ID, 1);
     }
 
@@ -58,8 +97,9 @@ public class MealServiceTest {
         assertMatch(actual, ADMIN_MEAL1);
     }
 
-    @Test(expected = NoResultException.class)
+    @Test
     public void getNotFound() throws Exception {
+        thrown.expect(NoResultException.class);
         service.get(MEAL1_ID, ADMIN_ID);
     }
 
@@ -70,8 +110,9 @@ public class MealServiceTest {
         assertMatch(service.get(MEAL1_ID, USER_ID), updated);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void updateNotFound() throws Exception {
+        thrown.expect(NotFoundException.class);
         service.update(MEAL1, ADMIN_ID);
     }
 
