@@ -17,14 +17,14 @@ public class DataJpaMealRepositoryImpl implements MealRepository {
     private CrudMealRepository mealRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private CrudUserRepository userRepository;
 
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
         if(!meal.isNew() && get(meal.getId(),userId) == null)
             return null;
-        meal.setUser(userRepository.get(userId));
+        meal.setUser(userRepository.getOne(userId));
         return mealRepository.save(meal);
     }
 
@@ -32,7 +32,7 @@ public class DataJpaMealRepositoryImpl implements MealRepository {
     @Transactional
     public boolean delete(int id, int userId) {
         //return mealRepository.delete(id, userId);
-        return (mealRepository.deleteByIdAndUser(id, userRepository.get(userId)) != null);
+        return (mealRepository.deleteByIdAndUser(id, userRepository.getOne(userId)) != null);
     }
 
     @Override
@@ -42,11 +42,11 @@ public class DataJpaMealRepositoryImpl implements MealRepository {
 
     @Override
     public List<Meal> getAll(int userId) {
-        return mealRepository.findAllByUserOrderByDateTimeDesc(userRepository.get(userId));
+        return mealRepository.findAllByUserOrderByDateTimeDesc(userRepository.getOne(userId));
     }
 
     @Override
     public List<Meal> getBetween(LocalDateTime startDate, LocalDateTime endDate, int userId) {
-        return mealRepository.findAllByUserAndDateTimeBetweenOrderByDateTimeDesc(userRepository.get(userId), startDate, endDate);
+        return mealRepository.findAllByUserAndDateTimeBetweenOrderByDateTimeDesc(userRepository.getOne(userId), startDate, endDate);
     }
 }
