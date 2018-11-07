@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.util.List;
 
+import static ru.javawebinar.topjava.Profiles.REPOSITORY_IMPLEMENTATION;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFound;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
@@ -18,6 +20,7 @@ import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
+
 
     @Autowired
     public UserServiceImpl(UserRepository repository) {

@@ -17,15 +17,17 @@
         <jdbc:script encoding="utf-8" location="classpath:db/populateDB.sql"/>
     </jdbc:initialize-database>
 
+
     <beans profile="hsqldb">
         <context:property-placeholder location="classpath:db/hsqldb.properties" system-properties-mode="OVERRIDE"/>
 
-        <bean id="dataSource"
-              class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+        <!--no pooling-->
+        <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"
               p:driverClassName="org.hsqldb.jdbcDriver"
               p:url="${database.url}"
               p:username="${database.username}"
-              p:password="${database.password}"/>
+              p:password="${database.password}"
+        />
     </beans>
 
     <beans profile="postgres">
@@ -64,15 +66,12 @@
         <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
               p:dataSource-ref="dataSource"
               p:packagesToScan="ru.javawebinar.**.model">
-            <!--p:persistenceUnitName="persistenceUnit">-->
 
-            <property name="jpaPropertyMap">
-                <map>
-                    <entry key="#{T(org.hibernate.cfg.AvailableSettings).FORMAT_SQL}" value="${hibernate.format_sql}"/>
-                    <entry key="#{T(org.hibernate.cfg.AvailableSettings).USE_SQL_COMMENTS}"
-                           value="${hibernate.use_sql_comments}"/>
-                    <entry key="#{T(org.hibernate.cfg.AvailableSettings).JPA_PROXY_COMPLIANCE}" value="false"/>
-                </map>
+            <property name="jpaProperties">
+                <props>
+                    <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+                    <prop key="hibernate.use_sql_comments">${hibernate.use_sql_comments}</prop>
+                </props>
             </property>
 
             <property name="jpaVendorAdapter">
