@@ -19,8 +19,8 @@ import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 @Service
 public class UserServiceImpl implements UserService {
 
+    @Autowired
     private final UserRepository repository;
-
 
     @Autowired
     public UserServiceImpl(UserRepository repository) {
