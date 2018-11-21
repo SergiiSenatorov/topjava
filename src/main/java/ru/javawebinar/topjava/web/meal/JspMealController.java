@@ -59,7 +59,7 @@ public class JspMealController extends AbstractMealController {
         LocalTime startTime = LocalTime.parse(resetParam("startTime", request));
         LocalTime endTime = LocalTime.parse(resetParam("endTime", request));
         model.addAttribute("meals",super.getBetween(startDate, startTime, endDate, endTime));
-        return "redirect:/meals";
+        return "meals";
     }
 
     private String resetParam(String param, HttpServletRequest request) {
