@@ -42,8 +42,10 @@ abstract public class AbstractControllerTest {
     @Autowired(required = false)
     private JpaUtil jpaUtil;
 
+    /*
     @Autowired
     protected UserService userService;
+    */
 
     @Autowired
     private WebApplicationContext webApplicationContext;
