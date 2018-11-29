@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
-import ru.javawebinar.topjava.util.DateTimeUtil;
+import ru.javawebinar.topjava.util.TimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
@@ -61,7 +61,7 @@ public abstract class AbstractMealController {
         log.info("getBetween dates({} - {}) time({} - {}) for user {}", startDate, endDate, startTime, endTime, userId);
 
         List<Meal> mealsDateFiltered = service.getBetweenDates(
-                orElse(startDate, DateTimeUtil.MIN_DATE), orElse(endDate, DateTimeUtil.MAX_DATE), userId);
+                orElse(startDate, TimeUtil.MIN_DATE), orElse(endDate, TimeUtil.MAX_DATE), userId);
 
         return MealsUtil.getFilteredWithExcess(mealsDateFiltered, SecurityUtil.authUserCaloriesPerDay(),
                 orElse(startTime, LocalTime.MIN), orElse(endTime, LocalTime.MAX)

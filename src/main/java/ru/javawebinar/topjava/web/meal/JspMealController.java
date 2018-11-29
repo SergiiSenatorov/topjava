@@ -14,8 +14,8 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalDate;
-import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
+import static ru.javawebinar.topjava.util.TimeUtil.parseLocalDate;
+import static ru.javawebinar.topjava.util.TimeUtil.parseLocalTime;
 
 @Controller
 @RequestMapping(value = "/meals")
